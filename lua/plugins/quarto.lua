@@ -369,6 +369,7 @@ return {
       { 'hrsh7th/cmp-path' },
       { 'hrsh7th/cmp-calc' },
       { 'hrsh7th/cmp-emoji' },
+      { 'hrsh7th/cmp-cmdline' },
       { 'saadparwaiz1/cmp_luasnip' },
       { 'f3fora/cmp-spell' },
       { 'ray-x/cmp-treesitter' },
@@ -411,6 +412,9 @@ return {
           expand = function(args)
             luasnip.lsp_expand(args.body)
           end,
+        },
+        experimental = {
+           ghost_text = true,
         },
         mapping = {
           ['<C-f>'] = cmp.mapping.scroll_docs(-4),
@@ -466,6 +470,7 @@ return {
               tags = "[tag]",
               treesitter = "[TS]",
               calc = "[calc]",
+              cmdline = "[cmd]",
               latex_symbols = "[tex]",
               emoji = "[emoji]",
             },
@@ -499,6 +504,31 @@ return {
       require("luasnip.loaders.from_vscode").lazy_load()
       -- for custom snippets
       require("luasnip.loaders.from_vscode").lazy_load({ paths = { "~/.config/nvim/snips" } })
+
+      local search_config = {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer',                 keyword_length = 5, max_item_count = 3 },
+        }
+      }
+      -- Use buffer source for `/` and `?`
+      cmp.setup.cmdline('/', search_config)
+      cmp.setup.cmdline('?', search_config)
+      -- cmp.setup.cmdline('/', search_config)
+      -- `:` cmdline setup.
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' }
+        }, {
+            {
+              name = 'cmdline',
+              option = {
+                ignore_cmds = { 'Man', '!' }
+              }
+            }
+          })
+      })
     end
   },
 
